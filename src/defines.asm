@@ -15,9 +15,11 @@ include
 !stripe_image    = $7F837D
 
 ; overworld
-!submap_id = $13C3
+!overworld_submap = $1F11
 !overworld_pos_x = $1F17
 !overworld_pos_y = $1F19
+!overworld_pos_pointer_x = $1F1F
+!overworld_pos_pointer_y = $1F21
 
 ; freeram
 !freeram = $0695 ; cleared on reset and titlescreen load

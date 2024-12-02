@@ -3,6 +3,7 @@ include
 org $108000
 gamemode_0e_hijack:
         jsl $048241
+        jsl $05DBF2
         ; jsr test_gm0e
         jsr test_warp
         rtl
@@ -21,8 +22,7 @@ test_warp:
 update_player_position:
         ldx !warp_index
         lda.l overworld_submap_table,x
-        sta !submap_id
-        sta $1f11
+        sta !overworld_submap
         rep #$20
         txa
         asl
@@ -31,17 +31,30 @@ update_player_position:
         and #$01FF
         sta !overworld_pos_x
         lsr #4
-        sta $1F1F
+        sta !overworld_pos_pointer_x
         lda.l overworld_pos_y_table,x
         and #$01FF
         sta !overworld_pos_y
         lsr #4
-        sta $1F21
+        sta !overworld_pos_pointer_y
         sep #$20
         stz $0DD5
         lda #$0B
         sta $0100
         rts 
+
+org $058E19
+display_warp_index:
+        lda !util_byetudlr_hold
+        and #%00010000
+        cmp #%00010000
+        beq .display_warp
+        lda $0DB4,x
+        rts
+
+    .display_warp:
+        lda !warp_index
+        rts
 
 incsrc "data/overworld_table.asm"
 
