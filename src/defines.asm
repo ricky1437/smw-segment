@@ -24,8 +24,5 @@ include
 ; freeram
 !freeram = $0695 ; cleared on reset and titlescreen load
 
-; test
-!test_gm0e = !freeram
-
 ; overworld warp
 !warp_index = !freeram+1

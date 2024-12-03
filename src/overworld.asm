@@ -3,21 +3,60 @@ include
 org $108000
 gamemode_0e_hijack:
         jsl $048241
-        jsl $05DBF2
-        ; jsr test_gm0e
+        jsr display_warp_index
         jsr test_warp
         rtl
 
-test_gm0e:
-        inc !test_gm0e
-        rts
-
 test_warp:
+        lda #$00
+        sta $13d4
+
         lda !util_byetudlr_hold
         and #%00110000
         cmp #%00110000
-        beq update_player_position
+        beq do_warp
+        lda !util_byetudlr_hold
+        and #%00010000
+        cmp #%00010000
+        beq control_warp
         rts
+
+control_warp:
+        lda !util_byetudlr_frame
+        and #%00001100
+        cmp #%00001000
+        beq .up
+        cmp #%00000100
+        beq .down
+        rts
+
+    .up:
+        lda !warp_index
+        inc
+        cmp #$0A
+        beq .reset
+        bra .store
+
+    .down:
+        lda !warp_index
+        dec
+        cmp #$FF
+        bne .store
+        lda #$09
+        bra .store
+
+    .reset:
+        stz !warp_index
+        rts
+
+    .store:
+        sta !warp_index
+        rts
+        
+do_warp:
+    jsr update_player_position
+    jsr update_player_score
+    rts
 
 update_player_position:
         ldx !warp_index
@@ -43,18 +82,60 @@ update_player_position:
         sta $0100
         rts 
 
-org $058E19
+update_player_score:
+        rts
+
 display_warp_index:
+        phb
+        phk
+        plb
         lda !util_byetudlr_hold
         and #%00010000
         cmp #%00010000
         beq .display_warp
-        lda $0DB4,x
+        jsr test_recover_stripe
+        plb
         rts
 
     .display_warp:
-        lda !warp_index
+        jsr test_stripe
+        plb
         rts
+
+test_stripe:
+        rep #$20
+        ldx #$06
+      - lda tbl_test_stripe,x
+        sta $7f837d,x
+        dex
+        bpl -
+        clc
+        lda $7f837d+4
+        adc !warp_index
+        sta $7f837d+4
+        lda #$06
+        sta $7f837b
+        sep #$20
+        rts
+
+test_recover_stripe:
+        rep #$20
+        ldx #$06
+      - lda tbl_test_recover_stripe,x
+        sta $7f837d,x
+        dex
+        bpl -
+        clc
+        lda #$06
+        sta $7f837b
+        sep #$20
+        rts
+
+tbl_test_stripe:
+    db $50,$00,$00,$01,$22,$39,$FF
+
+tbl_test_recover_stripe:
+    db $50,$00,$00,$01,$FE,$38,$FF
 
 incsrc "data/overworld_table.asm"
 
