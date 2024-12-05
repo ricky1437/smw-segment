@@ -25,4 +25,5 @@ include
 !freeram = $0695 ; cleared on reset and titlescreen load
 
 ; overworld warp
+!menu_flag = !freeram+0
 !warp_index = !freeram+1

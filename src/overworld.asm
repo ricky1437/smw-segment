@@ -4,6 +4,7 @@ org $108000
 gamemode_0e_hijack:
         jsl $048241
         jsr display_warp_index
+        jsr restore_graphics
         jsr test_warp
         rtl
 
@@ -93,11 +94,12 @@ display_warp_index:
         and #%00010000
         cmp #%00010000
         beq .display_warp
-        jsr test_recover_stripe
         plb
         rts
 
     .display_warp:
+        lda #$01
+        sta !menu_flag
         jsr test_stripe
         plb
         rts
@@ -118,6 +120,21 @@ test_stripe:
         sep #$20
         rts
 
+restore_graphics:
+        phb
+        phk
+        plb 
+        lda !menu_flag
+        cmp #$01
+        bne +
+        lda !util_byetudlr_hold
+        and #%00010000
+        cmp #%00000000
+        bne +
+        jsr test_recover_stripe
+      + plb
+        rts
+
 test_recover_stripe:
         rep #$20
         ldx #$06
@@ -129,6 +146,7 @@ test_recover_stripe:
         lda #$06
         sta $7f837b
         sep #$20
+        stz !menu_flag
         rts
 
 tbl_test_stripe:
