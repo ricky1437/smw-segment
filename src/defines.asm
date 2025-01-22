@@ -21,6 +21,9 @@ include
 !overworld_pos_pointer_x = $1F1F
 !overworld_pos_pointer_y = $1F21
 
+; overworld level setting flags
+!is_special_beaten = $1EEB
+
 ; freeram
 !freeram = $0695 ; cleared on reset and titlescreen load
 

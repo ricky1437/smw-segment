@@ -55,9 +55,10 @@ control_warp:
         rts
         
 do_warp:
-    jsr update_player_position
-    jsr update_player_score
-    rts
+        jsr update_player_position
+        jsr update_player_score
+        jsr update_special_status
+        rts
 
 update_player_position:
         ldx !warp_index
@@ -84,6 +85,26 @@ update_player_position:
         rts 
 
 update_player_score:
+        lda !warp_index
+        sta $00
+        asl a
+        clc
+        adc $00 ; X=3
+        tax
+        rep #$20
+        lda.l overworld_score_table,x ; only loads word bytes.
+        sta $0f34
+        sep #$20
+        inx #2 ; move data pointer to the high byte of score data.
+        lda.l overworld_score_table,x
+        sta $0f36 ; store in the high byte of score.
+        rts
+
+update_special_status:
+        lda !warp_index
+        tax
+        lda.l special_table,x
+        sta !is_special_beaten
         rts
 
 display_warp_index:
@@ -150,11 +171,13 @@ test_recover_stripe:
         rts
 
 tbl_test_stripe:
-    db $50,$00,$00,$01,$22,$39,$FF
+        db $50,$00,$00,$01,$22,$39,$FF
 
 tbl_test_recover_stripe:
-    db $50,$00,$00,$01,$FE,$38,$FF
+        db $50,$00,$00,$01,$FE,$38,$FF
 
-incsrc "data/overworld_table.asm"
+incsrc "data/overworld/position_table.asm"
+incsrc "data/overworld/score_table.asm"
+incsrc "data/overworld/special_table.asm"
 
 print "[src/overworld.asm]: ", pc, "/109000 inserted"
