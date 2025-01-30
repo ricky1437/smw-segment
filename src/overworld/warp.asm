@@ -50,13 +50,15 @@ do_warp:
         jsr update_player_position
         jsr update_player_score
         jsr update_special_status
+        jsr update_switch_palace
+        ; jsl reload_overworld
         rts
 
 update_player_position:
         ldx !warp_index
         lda.l overworld_submap_table,x
         sta !overworld_submap
-        rep #$20
+        %a16()
         txa
         asl
         tax
@@ -70,7 +72,7 @@ update_player_position:
         sta !overworld_pos_y
         lsr #4
         sta !overworld_pos_pointer_y
-        sep #$20
+        %a8()
         stz $0DD5
         lda #$0B
         sta $0100
@@ -83,10 +85,10 @@ update_player_score:
         clc
         adc $00 ; X=3
         tax
-        rep #$20
+        %a16()
         lda.l overworld_score_table,x ; only loads word bytes.
         sta $0F34
-        sep #$20
+        %a8()
         inx #2 ; move data pointer to the high byte of score data.
         lda.l overworld_score_table,x
         sta $0F36 ; store in the high byte of score.
@@ -98,6 +100,26 @@ update_special_status:
         lda.l special_table,x
         sta !is_special_beaten
         rts
+
+update_switch_palace:
+        ldy #$00
+        lda !warp_index
+        asl a : asl a
+        tax
+      - lda.l switch_palace_table,x
+        sta !switch_palace,y
+        inx
+        iny
+        cpy #$04
+        bne -
+        rts
+
+
+incsrc "data/position_table.asm"
+incsrc "data/score_table.asm"
+incsrc "data/special_table.asm"
+incsrc "data/switch_palace_table.asm"
+
 
 display_warp_index:
         phb
@@ -113,12 +135,12 @@ display_warp_index:
     .display_warp:
         lda #$01
         sta !menu_flag
-        jsr test_stripe
+        jsr test_upload_stripe
         plb
         rts
 
-test_stripe:
-        rep #$20
+test_upload_stripe:
+        %a16()
         ldx #$06
       - lda tbl_test_stripe,x
         sta $7F837D,x
@@ -130,7 +152,7 @@ test_stripe:
         sta $7F837D+4
         lda #$06
         sta $7F837B
-        sep #$20
+        %a8()
         rts
 
 restore_graphics:
@@ -149,7 +171,7 @@ restore_graphics:
         rts
 
 test_recover_stripe:
-        rep #$20
+        %a16()
         ldx #$06
       - lda tbl_test_recover_stripe,x
         sta $7F837D,x
@@ -158,7 +180,7 @@ test_recover_stripe:
         clc
         lda #$06
         sta $7F837B
-        sep #$20
+        %a8()
         stz !menu_flag
         rts
 
@@ -167,7 +189,3 @@ tbl_test_stripe:
 
 tbl_test_recover_stripe:
         db $50,$00,$00,$01,$FE,$38,$FF
-
-incsrc "data/position_table.asm"
-incsrc "data/score_table.asm"
-incsrc "data/special_table.asm"
