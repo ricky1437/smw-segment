@@ -23,7 +23,6 @@ save_to_sram:
     .done:
         rts
 
-print pc
 load_sram:
 	lda !isSramUsed
 	cmp #$01
