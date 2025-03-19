@@ -7,7 +7,7 @@ test_player_status:
         beq +
         jsr cycle_powerup
         jsr cycle_yoshi
-        jsr load_sram
+        jsr save_to_sram 
       + rts
 
 cycle_powerup:

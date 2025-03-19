@@ -52,8 +52,9 @@ include
 ; sram
 !freesram = $700360
 
-!sram_powerups = !freesram
-!sram_item_box = !freesram+1
-!sram_yoshi_color = !freesram+2
+!isSramUsed = !freesram
+!sram_powerups = !freesram+1
+!sram_item_box = !freesram+2
+!sram_yoshi_color = !freesram+3
 
-!sram_warp_index = !freesram+3
+!sram_warp_index = !freesram+4

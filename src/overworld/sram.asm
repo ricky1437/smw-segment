@@ -4,9 +4,9 @@ save_to_sram:
         lda !util_axlr_hold
         cmp #%00110000
         bne .done
-        lda !util_byetudlr_hold
-        and #%00010000
-        bne .done
+
+	lda #$01
+	sta !isSramUsed
 
         lda !player_powerups_buffer
         sta !sram_powerups
@@ -23,7 +23,12 @@ save_to_sram:
     .done:
         rts
 
+print pc
 load_sram:
+	lda !isSramUsed
+	cmp #$01
+	bne .done
+
         lda !util_axlr_hold
         cmp #%00110000
         bne .done
@@ -37,7 +42,7 @@ load_sram:
         lda !sram_warp_index
         sta !warp_index
 
-        lda #$0B
+        lda #$0C
         sta $1DF9
         ; 更新
         jsr do_warp

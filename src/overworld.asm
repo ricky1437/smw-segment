@@ -8,7 +8,7 @@ gamemode_0e_hijack:
         jsr restore_graphics
         jsr test_warp
         jsr test_player_status
-        jsr save_to_sram
+        jsr load_sram 
         rtl
 
 incsrc "overworld/warp.asm"
